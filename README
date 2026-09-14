@@ -1,0 +1,29 @@
+# Semana 5
+
+**caso:** Coordinacion de entregas en Speedfast
+
+**Asignatura:** Desarrollo a Objetos II
+
+
+## Estructura del proyecto
+```
+Semana5-SpeedFast/
+└── src/
+    └── com/
+        └── speedfast/
+            ├── Main.java                      (clase principal / punto de entrada)
+            ├── modelo/
+            │   ├── EstadoPedido.java          (enum: PENDIENTE, EN_REPARTO, ENTREGADO)
+            │   └── Pedido.java                (encomienda: id, dirección, estado)
+            └── concurrencia/
+                ├── ZonaDeCarga.java           (recurso compartido sincronizado)
+                └── Repartidor.java            (Runnable ejecutado en cada hilo)
+```
+
+## Funcionamiento
+
+- La clases **`ZonaDeCarga`** almacena los pedidos en un `BlockingQueue<Pedido> (estructura *thread-safe*) y expone los metodos `agregarPedido(...)`
+ y `retirarPedido()` declarados como **`synchronized`**.
+- `retirarPedido()` usa `poll()` de forma atomica y dentro de la misma seccion, marca el pedido como `EN_REPARTO`.
+ Asi aunque tres repartidores compitan al mismo tiempo, **solo uno obtiene cada pedido** y el resto recibe `null`. Esto elimina las entregas duplicadas.
+-Cada **`Repartido`** implemeta `runnable` y se ejecuta en su propio hilo, administrado por un `ExecutorService` en `Main`.
